@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ministry Meeting</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#667085;--line:#e5e9f0;--primary:#4255d4;--primary2:#3445ba;--soft:#eef1ff;--ok:#167b53;--bad:#bd3d3d;--warn:#936300;--shadow:0 18px 50px rgba(32,44,85,.10);--r:22px}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;background:radial-gradient(circle at top left,rgba(66,85,212,.12),transparent 34%),linear-gradient(180deg,#fafbff,var(--bg));color:var(--text);min-height:100vh}
+button,input,select,textarea{font:inherit}.wrap{width:min(1180px,calc(100% - 28px));margin:auto;padding:28px 0 46px}
+header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:20px}.brand{display:flex;align-items:center;gap:12px;font-size:20px;font-weight:900}.logo{width:42px;height:42px;border-radius:14px;background:var(--primary);color:#fff;display:grid;place-items:center;box-shadow:0 10px 25px rgba(66,85,212,.22)}
+.actions,.seg{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.seg{background:#fff;border:1px solid var(--line);padding:5px;border-radius:14px;box-shadow:0 8px 24px rgba(32,44,85,.06)}.seg button{border:0;background:transparent;color:var(--muted);font-weight:800;padding:9px 12px;border-radius:10px;cursor:pointer}.seg button.active{background:var(--primary);color:#fff}
+.setup{display:none;background:#fff5dc;color:#755000;border:1px solid #eed79b;border-radius:16px;padding:15px;margin-bottom:18px;line-height:1.6;font-size:14px}
+.hero{background:linear-gradient(135deg,#22305d,#4255d4);color:#fff;border-radius:28px;padding:34px;box-shadow:var(--shadow);margin-bottom:22px}.hero h1{margin:0 0 10px;font-size:clamp(30px,4.7vw,50px);line-height:1.12}.hero p{margin:0;color:rgba(255,255,255,.82);font-size:16px;line-height:1.7;max-width:820px}
+.grid{display:grid;grid-template-columns:1.35fr .65fr;gap:22px;align-items:start}.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}.main{padding:26px}.side{padding:22px;position:sticky;top:20px}
+.section{padding-bottom:24px;margin-bottom:24px;border-bottom:1px solid var(--line)}.section:last-of-type{border-bottom:0}.title{display:flex;align-items:center;gap:10px;font-weight:900;font-size:18px;margin-bottom:16px}.num{width:30px;height:30px;border-radius:10px;background:var(--soft);color:var(--primary);display:grid;place-items:center;font-size:14px}
+.people{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.person{border:1.5px solid var(--line);border-radius:18px;padding:16px;cursor:pointer;display:flex;align-items:center;gap:13px;transition:.2s;background:#fff}.person:hover{transform:translateY(-2px);border-color:#bbc4ff}.person.selected{background:var(--soft);border-color:var(--primary)}.avatar{width:52px;height:52px;border-radius:16px;background:#f1f3f7;display:grid;place-items:center;font-size:24px}.pname{font-weight:900;margin-bottom:4px}.prole{font-size:13px;color:var(--muted)}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}label{display:block;font-size:14px;font-weight:800;margin-bottom:8px}input,select,textarea{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:13px 14px;background:#fff;color:var(--text);outline:none}input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(66,85,212,.09)}textarea{min-height:105px;resize:vertical}
+.times{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.time{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:11px 7px;font-weight:800;cursor:pointer}.time.selected{background:var(--primary);border-color:var(--primary);color:#fff}.time:disabled{opacity:.42;cursor:not-allowed;text-decoration:line-through}
+.primary,.secondary,.danger,.approve{border:0;border-radius:12px;padding:11px 14px;font-weight:900;cursor:pointer}.primary{width:100%;background:var(--primary);color:#fff}.primary:hover{background:var(--primary2)}.secondary{background:#f1f3f7;color:var(--text)}.danger{background:#fff0f0;color:var(--bad)}.approve{background:#e9f8f1;color:var(--ok)}
+.summary h2,.sub{margin:0 0 15px;font-size:20px;font-weight:900}.sumlist{display:grid;gap:13px}.sum{display:flex;justify-content:space-between;gap:16px;padding-bottom:13px;border-bottom:1px solid var(--line);font-size:14px}.sum span{color:var(--muted)}.sum strong{text-align:right}.note,.empty{margin-top:16px;background:#f8f9fc;border-radius:14px;padding:14px;color:var(--muted);font-size:13px;line-height:1.6}.msg{display:none;margin-top:14px;border-radius:14px;padding:14px;font-size:14px;font-weight:800;line-height:1.6}.msg.ok{background:#e9f8f1;color:var(--ok)}.msg.bad{background:#fff0f0;color:var(--bad)}
+#adminPanel{display:none}.login{max-width:480px;margin:auto;padding:26px}.login h2{margin-top:0}.adminhead{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;margin-bottom:18px}.adminGrid{display:grid;grid-template-columns:.8fr 1.2fr;gap:20px}.box{border:1px solid var(--line);border-radius:18px;padding:18px}.list{display:grid;gap:10px}.item{border:1px solid var(--line);border-radius:14px;padding:13px}.itemtop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.meta{color:var(--muted);font-size:13px;line-height:1.6;margin-top:4px}.reason{margin-top:10px;padding:10px 12px;background:#f8f9fc;border-radius:11px;font-size:14px;line-height:1.5}.rowactions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}.pill{border-radius:999px;padding:5px 9px;font-size:12px;font-weight:900}.pending{background:#fff5dc;color:var(--warn)}.approved{background:#e9f8f1;color:var(--ok)}.declined{background:#fff0f0;color:var(--bad)}.blockrow{display:flex;justify-content:space-between;gap:12px;align-items:center}
+footer{text-align:center;color:var(--muted);font-size:13px;padding-top:26px}
+@media(max-width:900px){.grid,.adminGrid{grid-template-columns:1fr}.side{position:static}}@media(max-width:620px){.wrap{width:min(100% - 18px,1180px);padding-top:16px}header{align-items:flex-start;flex-direction:column}.hero{padding:28px 22px}.main,.side{padding:19px}.people,.two{grid-template-columns:1fr}.times{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand"><div class="logo">✦</div><span>Ministry Meeting</span></div>
+  <div class="actions">
+    <div class="seg">
+      <button class="active" data-view="student" data-i18n="studentView">학생 예약</button>
+      <button data-view="admin" data-i18n="adminView">목사님 관리</button>
+    </div>
+    <div class="seg">
+      <button class="active" data-lang="ko">한국어</button>
+      <button data-lang="en">English</button>
+    </div>
+  </div>
+</header>
+
+<div class="setup" id="setupBanner"></div>
+
+<section class="hero">
+  <h1 data-i18n="heroTitle">온라인 미팅 예약</h1>
+  <p data-i18n="heroText">학생의 예약은 온라인 데이터베이스에 저장되고, 로그인한 담당 목사님은 다른 기기에서도 즉시 확인하고 관리할 수 있습니다.</p>
+</section>
+
+<section id="studentPanel">
+<div class="grid">
+  <main class="card main">
+    <div class="section">
+      <div class="title"><span class="num">1</span><span data-i18n="step1">미팅할 분을 선택하세요</span></div>
+      <div class="people">
+        <div class="person" data-person="chester"><div class="avatar">👨🏻‍💼</div><div><div class="pname" data-i18n="chesterName">체스터 목사님</div><div class="prole" data-i18n="chesterRole">상담 · 학교 · 진로</div></div></div>
+        <div class="person" data-person="ui"><div class="avatar">👨🏻‍💼</div><div><div class="pname" data-i18n="uiName">의목사님</div><div class="prole" data-i18n="uiRole">생활 · 신앙 · 사역</div></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="title"><span class="num">2</span><span data-i18n="step2">날짜와 시간을 선택하세요</span></div>
+      <div class="two" style="margin-bottom:16px">
+        <div><label data-i18n="date">날짜</label><input id="date" type="date"></div>
+        <div><label data-i18n="duration">미팅 시간</label><select id="duration"><option value="30">30분</option><option value="45">45분</option><option value="60">60분</option></select></div>
+      </div>
+      <label data-i18n="available">가능한 시간</label>
+      <div class="times" id="timeGrid"></div>
+    </div>
+
+    <div class="section">
+      <div class="title"><span class="num">3</span><span data-i18n="step3">예약 정보를 입력하세요</span></div>
+      <div style="margin-bottom:14px"><label data-i18n="name">이름</label><input id="studentName" data-i18n-placeholder="namePh" placeholder="이름을 입력하세요"></div>
+      <div style="margin-bottom:14px">
+        <label><span data-i18n="phone">전화번호</span> <span style="font-weight:500;color:var(--muted)" data-i18n="optional">(선택)</span></label>
+        <input id="phone" type="tel" autocomplete="tel" data-i18n-placeholder="phonePh" placeholder="전화번호를 입력하세요">
+      </div>
+      <div><label data-i18n="reason">미팅 사유</label><textarea id="reason" data-i18n-placeholder="reasonPh" placeholder="간단하게 미팅 내용을 적어주세요."></textarea></div>
+    </div>
+
+    <button class="primary" id="bookBtn" data-i18n="book">미팅 예약 요청 보내기</button>
+    <div class="msg bad" id="studentError"></div>
+    <div class="msg ok" id="studentSuccess"></div>
+  </main>
+
+  <aside class="card side summary">
+    <h2 data-i18n="summary">예약 내용</h2>
+    <div class="sumlist">
+      <div class="sum"><span data-i18n="person">담당자</span><strong id="sumPerson">선택 전</strong></div>
+      <div class="sum"><span data-i18n="date">날짜</span><strong id="sumDate">선택 전</strong></div>
+      <div class="sum"><span data-i18n="time">시간</span><strong id="sumTime">선택 전</strong></div>
+      <div class="sum"><span data-i18n="length">소요 시간</span><strong id="sumDuration">30분</strong></div>
+    </div>
+    <div class="note" data-i18n="studentNote">예약 요청은 대기 상태로 저장됩니다. 이미 예약됐거나 담당자가 막은 시간은 선택할 수 없습니다.</div>
+  </aside>
+</div>
+</section>
+
+<section id="adminPanel">
+  <div class="card login" id="loginCard">
+    <h2 data-i18n="leaderLogin">목사님 로그인</h2>
+    <div style="margin-bottom:13px"><label data-i18n="loginEmail">로그인 이메일</label><input id="loginEmail" type="email" autocomplete="username"></div>
+    <div style="margin-bottom:16px"><label data-i18n="password">비밀번호</label><input id="loginPassword" type="password" autocomplete="current-password"></div>
+    <button class="primary" id="loginBtn" data-i18n="login">로그인</button>
+    <div class="msg bad" id="loginError"></div>
+  </div>
+
+  <div class="card main" id="dashboard" style="display:none">
+    <div class="adminhead">
+      <div><div class="sub" id="dashboardTitle"></div><div class="meta" id="signedInEmail"></div></div>
+      <div class="actions">
+        <button class="secondary" id="notifyBtn" data-i18n="enableNotifications">🔔 알림 켜기</button>
+        <button class="secondary" id="logoutBtn" data-i18n="logout">로그아웃</button>
+      </div>
+    </div>
+    <div class="adminGrid">
+      <section class="box">
+        <h3 class="sub" data-i18n="blockTitle">불가능한 시간 설정</h3>
+        <div class="two">
+          <div><label data-i18n="date">날짜</label><input id="blockDate" type="date"></div>
+          <div><label data-i18n="time">시간</label><select id="blockTime"></select></div>
+        </div>
+        <button class="primary" id="blockBtn" style="margin-top:14px" data-i18n="blockBtn">이 시간 예약 막기</button>
+        <div class="msg bad" id="blockError"></div>
+        <h4 data-i18n="blockedTimes">막아둔 시간</h4>
+        <div class="list" id="blockedList"></div>
+      </section>
+      <section class="box">
+        <h3 class="sub" data-i18n="requests">예약 요청</h3>
+        <div class="list" id="bookingList"></div>
+      </section>
+    </div>
+  </div>
+</section>
+
+<footer>© 2026 Ministry Meeting</footer>
+</div>
+
+<script>
+/* STEP 1: Replace these two values with Supabase > Connect details. */
+const SUPABASE_URL = 'https://svsskhmstxzhqhacicfm.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_oKgA3wC-vvZSyZj7KLetww_vJcXzfq-';
+
+const configured =
+  SUPABASE_URL.startsWith('https://') &&
+  !SUPABASE_URL.includes('YOUR-') &&
+  !SUPABASE_PUBLISHABLE_KEY.includes('YOUR-');
+
+const client = configured
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+  : null;
+
+const slots=['09:00 AM','10:00 AM','11:00 AM','01:00 PM','02:00 PM','03:00 PM','04:00 PM','07:00 PM'];
+const $=id=>document.getElementById(id);
+let lang='ko', selectedLeader='', selectedTime='', adminLeader='', realtimeChannel=null, audioContext=null;
+
+const T={
+ko:{
+ studentView:'학생 예약',adminView:'목사님 관리',heroTitle:'온라인 미팅 예약',
+ heroText:'학생의 예약은 온라인 데이터베이스에 저장되고, 로그인한 담당 목사님은 다른 기기에서도 즉시 확인하고 관리할 수 있습니다.',
+ step1:'미팅할 분을 선택하세요',chesterName:'체스터 목사님',chesterRole:'상담 · 학교 · 진로',
+ uiName:'의목사님',uiRole:'생활 · 신앙 · 사역',step2:'날짜와 시간을 선택하세요',date:'날짜',
+ duration:'미팅 시간',available:'가능한 시간',step3:'예약 정보를 입력하세요',name:'이름',
+ namePh:'이름을 입력하세요',phone:'전화번호',optional:'(선택)',phonePh:'전화번호를 입력하세요',reason:'미팅 사유',reasonPh:'간단하게 미팅 내용을 적어주세요.',
+ book:'미팅 예약 요청 보내기',summary:'예약 내용',person:'담당자',time:'시간',length:'소요 시간',
+ studentNote:'예약 요청은 대기 상태로 저장됩니다. 이미 예약됐거나 담당자가 막은 시간은 선택할 수 없습니다.',
+ leaderLogin:'목사님 로그인',loginEmail:'로그인 이메일',password:'비밀번호',login:'로그인',logout:'로그아웃',
+ enableNotifications:'🔔 알림 켜기',notificationsOn:'🔔 알림 켜짐',notificationsDenied:'알림이 차단됨',
+ notificationsUnsupported:'이 브라우저는 알림을 지원하지 않습니다.',newBookingTitle:'새로운 미팅 예약',phoneAdmin:'전화번호',
+ blockTitle:'불가능한 시간 설정',blockBtn:'이 시간 예약 막기',blockedTimes:'막아둔 시간',requests:'예약 요청',
+ notSelected:'선택 전',chooseFirst:'먼저 담당자와 날짜를 선택해주세요.',sunday:'일요일은 예약할 수 없습니다.',
+ loading:'불러오는 중...',required:'모든 필수 정보를 입력해주세요.',saved:'예약 요청이 온라인에 저장되었습니다.',
+ setup:'Supabase 연결 정보가 아직 입력되지 않았습니다. SETUP_KO.md의 안내에 따라 HTML 아래쪽의 URL과 Publishable Key를 교체하세요.',
+ connectionError:'데이터베이스 연결에 실패했습니다.',slotTaken:'방금 다른 예약이 들어갔거나 예약 불가능한 시간입니다.',
+ loginFailed:'로그인 정보를 확인해주세요.',dashboard:n=>`${n} 일정 관리`,remove:'해제',noneBlocked:'막아둔 시간이 없습니다.',
+ noneRequests:'예약 요청이 없습니다.',approve:'승인',decline:'거절',delete:'삭제',pending:'대기 중',approved:'승인됨',
+ declined:'거절됨',blockFailed:'시간을 막을 수 없습니다. 이미 예약됐는지 확인해주세요.',duration:n=>`${n}분`
+},
+en:{
+ studentView:'Student Booking',adminView:'Leader Dashboard',heroTitle:'Online Meeting Booking',
+ heroText:'Bookings are stored online, and the assigned pastor can review and manage them immediately from another device after signing in.',
+ step1:'Choose who you would like to meet',chesterName:'Pastor.Chester',chesterRole:'Counseling · School · Career',
+ uiName:'Pastor.Ui',uiRole:'Life · Faith · Ministry',step2:'Choose a date and time',date:'Date',
+ duration:'Meeting length',available:'Available times',step3:'Enter your booking information',name:'Name',
+ namePh:'Enter your name',phone:'Phone number',optional:'(optional)',phonePh:'Enter your phone number',reason:'Reason for meeting',reasonPh:'Briefly describe what you would like to discuss.',
+ book:'Send Booking Request',summary:'Booking Summary',person:'Meeting with',time:'Time',length:'Length',
+ studentNote:'Requests are saved as pending. Times that are booked or blocked by the leader cannot be selected.',
+ leaderLogin:'Leader Login',loginEmail:'Login email',password:'Password',login:'Log In',logout:'Log Out',
+ enableNotifications:'🔔 Enable Alerts',notificationsOn:'🔔 Alerts On',notificationsDenied:'Alerts Blocked',
+ notificationsUnsupported:'This browser does not support notifications.',newBookingTitle:'New Meeting Booking',phoneAdmin:'Phone',
+ blockTitle:'Block Unavailable Time',blockBtn:'Block This Time',blockedTimes:'Blocked Times',requests:'Booking Requests',
+ notSelected:'Not selected',chooseFirst:'Choose a leader and date first.',sunday:'No bookings are available on Sundays.',
+ loading:'Loading...',required:'Please complete all required fields.',saved:'Your booking request was saved online.',
+ setup:'Supabase connection details have not been entered. Follow SETUP_KO.md and replace the URL and Publishable Key near the bottom of this HTML file.',
+ connectionError:'Could not connect to the database.',slotTaken:'This time was just booked or is no longer available.',
+ loginFailed:'Please check your login information.',dashboard:n=>`${n} Schedule`,remove:'Remove',noneBlocked:'No blocked times.',
+ noneRequests:'No booking requests.',approve:'Approve',decline:'Decline',delete:'Delete',pending:'Pending',approved:'Approved',
+ declined:'Declined',blockFailed:'Could not block this time. Check whether a booking already exists.',duration:n=>`${n} min`
+}};
+
+function leaderName(key){
+  if(key==='chester') return T[lang].chesterName;
+  if(key==='ui') return T[lang].uiName;
+  return T[lang].notSelected;
+}
+function formatDate(v){
+  if(!v)return T[lang].notSelected;
+  return new Date(v+'T12:00:00').toLocaleDateString(lang==='ko'?'ko-KR':'en-US',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
+}
+function setMessage(id,text,show=true){const el=$(id);el.textContent=text;el.style.display=show?'block':'none'}
+function setMinDates(){
+  const d=new Date(),v=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  $('date').min=v;$('blockDate').min=v;
+}
+setMinDates();
+slots.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;$('blockTime').appendChild(o)});
+
+async function renderTimes(){
+  selectedTime='';$('sumTime').textContent=T[lang].notSelected;
+  if(!selectedLeader||!$('date').value){$('timeGrid').innerHTML=`<div class="empty" style="grid-column:1/-1">${T[lang].chooseFirst}</div>`;return}
+  if(new Date($('date').value+'T12:00:00').getDay()===0){$('timeGrid').innerHTML=`<div class="empty" style="grid-column:1/-1">${T[lang].sunday}</div>`;return}
+  if(!configured){$('timeGrid').innerHTML=`<div class="empty" style="grid-column:1/-1">${T[lang].setup}</div>`;return}
+  $('timeGrid').innerHTML=`<div class="empty" style="grid-column:1/-1">${T[lang].loading}</div>`;
+  const {data,error}=await client.rpc('get_unavailable_slots',{p_leader:selectedLeader,p_date:$('date').value});
+  if(error){$('timeGrid').innerHTML=`<div class="empty" style="grid-column:1/-1">${T[lang].connectionError}</div>`;return}
+  const unavailable=new Set((data||[]).map(x=>x.meeting_time));
+  $('timeGrid').innerHTML='';
+  slots.forEach(s=>{
+    const b=document.createElement('button');b.className='time';b.type='button';b.textContent=s;b.disabled=unavailable.has(s);
+    b.onclick=()=>{document.querySelectorAll('.time').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');selectedTime=s;$('sumTime').textContent=s};
+    $('timeGrid').appendChild(b);
+  });
+}
+
+document.querySelectorAll('.person').forEach(el=>el.onclick=()=>{
+  document.querySelectorAll('.person').forEach(x=>x.classList.remove('selected'));el.classList.add('selected');
+  selectedLeader=el.dataset.person;$('sumPerson').textContent=leaderName(selectedLeader);renderTimes();
+});
+$('date').onchange=()=>{$('sumDate').textContent=formatDate($('date').value);renderTimes()};
+$('duration').onchange=()=>{$('sumDuration').textContent=T[lang].duration($('duration').value)};
+
+$('bookBtn').onclick=async()=>{
+  setMessage('studentError','',false);setMessage('studentSuccess','',false);
+  const student_name=$('studentName').value.trim(),phone=$('phone').value.trim(),reason=$('reason').value.trim();
+  if(!configured){setMessage('studentError',T[lang].setup);return}
+  if(!selectedLeader||!$('date').value||!selectedTime||!student_name||!reason){setMessage('studentError',T[lang].required);return}
+  $('bookBtn').disabled=true;
+  const {error}=await client.from('bookings').insert({
+    leader:selectedLeader,student_name,meeting_date:$('date').value,meeting_time:selectedTime,
+    duration:Number($('duration').value),phone:phone||null,reason,status:'pending'
+  });
+  $('bookBtn').disabled=false;
+  if(error){setMessage('studentError',error.code==='23505'?T[lang].slotTaken:T[lang].connectionError);await renderTimes();return}
+  setMessage('studentSuccess',T[lang].saved);await renderTimes();
+};
+
+async function login(){
+  if(!configured){setMessage('loginError',T[lang].setup);return}
+  setMessage('loginError','',false);
+  const {error}=await client.auth.signInWithPassword({email:$('loginEmail').value.trim(),password:$('loginPassword').value});
+  if(error)setMessage('loginError',T[lang].loginFailed);
+}
+$('loginBtn').onclick=login;
+$('loginPassword').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
+$('logoutBtn').onclick=()=>client&&client.auth.signOut();
+
+async function showSession(session){
+  if(!session){adminLeader='';$('loginCard').style.display='block';$('dashboard').style.display='none';if(realtimeChannel){client.removeChannel(realtimeChannel);realtimeChannel=null}return}
+  const {data,error}=await client.from('admin_profiles').select('leader').single();
+  if(error||!data){setMessage('loginError',T[lang].loginFailed);await client.auth.signOut();return}
+  adminLeader=data.leader;$('loginCard').style.display='none';$('dashboard').style.display='block';
+  $('signedInEmail').textContent=session.user.email||'';$('dashboardTitle').textContent=T[lang].dashboard(leaderName(adminLeader));
+  await loadAdminData();subscribeAdmin();
+}
+async function loadAdminData(){
+  if(!adminLeader)return;
+  const [{data:blocks,error:blockError},{data:bookings,error:bookingError}]=await Promise.all([
+    client.from('blocked_slots').select('*').eq('leader',adminLeader).order('meeting_date').order('meeting_time'),
+    client.from('bookings').select('*').eq('leader',adminLeader).order('meeting_date').order('meeting_time')
+  ]);
+  if(!blockError)renderBlocked(blocks||[]);
+  if(!bookingError)renderBookings(bookings||[]);
+}
+function renderBlocked(rows){
+  $('blockedList').innerHTML=rows.length?'':`<div class="empty">${T[lang].noneBlocked}</div>`;
+  rows.forEach(x=>{
+    const el=document.createElement('div');el.className='item blockrow';
+    el.innerHTML=`<div><strong>${formatDate(x.meeting_date)}</strong><div class="meta">${x.meeting_time}</div></div><button class="danger">${T[lang].remove}</button>`;
+    el.querySelector('button').onclick=async()=>{await client.from('blocked_slots').delete().eq('id',x.id);await loadAdminData();await renderTimes()};
+    $('blockedList').appendChild(el);
+  });
+}
+function renderBookings(rows){
+  $('bookingList').innerHTML=rows.length?'':`<div class="empty">${T[lang].noneRequests}</div>`;
+  rows.forEach(x=>{
+    const el=document.createElement('div');el.className='item';
+    const phoneLine=x.phone?`<div class="meta">${T[lang].phoneAdmin}: <a href="tel:${escapeHtml(x.phone)}">${escapeHtml(x.phone)}</a></div>`:'';
+    el.innerHTML=`<div class="itemtop"><div><strong>${escapeHtml(x.student_name)}</strong><div class="meta">${formatDate(x.meeting_date)} · ${x.meeting_time} · ${T[lang].duration(x.duration)}</div>${phoneLine}</div><span class="pill ${x.status}">${T[lang][x.status]}</span></div><div class="reason">${escapeHtml(x.reason)}</div><div class="rowactions"><button class="approve">${T[lang].approve}</button><button class="danger declineBtn">${T[lang].decline}</button><button class="secondary deleteBtn">${T[lang].delete}</button></div>`;
+    el.querySelector('.approve').onclick=()=>changeStatus(x.id,'approved');
+    el.querySelector('.declineBtn').onclick=()=>changeStatus(x.id,'declined');
+    el.querySelector('.deleteBtn').onclick=async()=>{await client.from('bookings').delete().eq('id',x.id);await loadAdminData();await renderTimes()};
+    $('bookingList').appendChild(el);
+  });
+}
+async function changeStatus(id,status){await client.from('bookings').update({status}).eq('id',id);await loadAdminData();await renderTimes()}
+$('blockBtn').onclick=async()=>{
+  setMessage('blockError','',false);
+  if(!$('blockDate').value)return;
+  const {error}=await client.from('blocked_slots').insert({leader:adminLeader,meeting_date:$('blockDate').value,meeting_time:$('blockTime').value});
+  if(error)setMessage('blockError',T[lang].blockFailed);
+  await loadAdminData();await renderTimes();
+};
+
+function playNotificationSound(){
+  try{
+    audioContext=audioContext||new (window.AudioContext||window.webkitAudioContext)();
+    if(audioContext.state==='suspended')audioContext.resume();
+    const now=audioContext.currentTime;
+    [0,0.18].forEach((delay,index)=>{
+      const oscillator=audioContext.createOscillator();
+      const gain=audioContext.createGain();
+      oscillator.type='sine';
+      oscillator.frequency.value=index===0?740:980;
+      gain.gain.setValueAtTime(0.001,now+delay);
+      gain.gain.exponentialRampToValueAtTime(0.22,now+delay+0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001,now+delay+0.20);
+      oscillator.connect(gain);
+      gain.connect(audioContext.destination);
+      oscillator.start(now+delay);
+      oscillator.stop(now+delay+0.22);
+    });
+  }catch(_error){}
+}
+function notifyNewBooking(booking){
+  playNotificationSound();
+  if('Notification' in window&&Notification.permission==='granted'){
+    const body=`${booking.student_name} · ${formatDate(booking.meeting_date)} · ${booking.meeting_time}`;
+    const notification=new Notification(T[lang].newBookingTitle,{body,tag:`booking-${booking.id}`});
+    notification.onclick=()=>{window.focus();notification.close()};
+  }
+}
+$('notifyBtn').onclick=async()=>{
+  if(!('Notification' in window)){
+    $('notifyBtn').textContent=T[lang].notificationsUnsupported;
+    return;
+  }
+  audioContext=audioContext||new (window.AudioContext||window.webkitAudioContext)();
+  if(audioContext.state==='suspended')await audioContext.resume();
+  const permission=await Notification.requestPermission();
+  $('notifyBtn').textContent=permission==='granted'?T[lang].notificationsOn:T[lang].notificationsDenied;
+  if(permission==='granted')playNotificationSound();
+};
+
+function subscribeAdmin(){
+  if(realtimeChannel)client.removeChannel(realtimeChannel);
+  realtimeChannel=client.channel(`leader-${adminLeader}-${Date.now()}`)
+    .on('postgres_changes',{event:'*',schema:'public',table:'bookings',filter:`leader=eq.${adminLeader}`},payload=>{
+      loadAdminData();
+      if(payload.eventType==='INSERT')notifyNewBooking(payload.new);
+    })
+    .on('postgres_changes',{event:'*',schema:'public',table:'blocked_slots',filter:`leader=eq.${adminLeader}`},loadAdminData)
+    .subscribe();
+}
+function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+document.querySelectorAll('[data-view]').forEach(btn=>btn.onclick=async()=>{
+  document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('active',x===btn));
+  const admin=btn.dataset.view==='admin';$('studentPanel').style.display=admin?'none':'block';$('adminPanel').style.display=admin?'block':'none';
+  if(admin&&configured){const {data}=await client.auth.getSession();await showSession(data.session)}
+});
+function applyLanguage(next){
+  lang=next;document.documentElement.lang=next;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const v=T[lang][el.dataset.i18n];if(typeof v==='string')el.textContent=v});
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>el.placeholder=T[lang][el.dataset.i18nPlaceholder]);
+  document.querySelectorAll('[data-lang]').forEach(x=>x.classList.toggle('active',x.dataset.lang===next));
+  [...$('duration').options].forEach(o=>o.textContent=T[lang].duration(o.value));
+  $('sumPerson').textContent=selectedLeader?leaderName(selectedLeader):T[lang].notSelected;
+  $('sumDate').textContent=formatDate($('date').value);$('sumTime').textContent=selectedTime||T[lang].notSelected;
+  $('sumDuration').textContent=T[lang].duration($('duration').value);
+  if(adminLeader){$('dashboardTitle').textContent=T[lang].dashboard(leaderName(adminLeader));loadAdminData()}
+  if($('notifyBtn')){
+    if('Notification' in window&&Notification.permission==='granted')$('notifyBtn').textContent=T[lang].notificationsOn;
+    else $('notifyBtn').textContent=T[lang].enableNotifications;
+  }
+  if(!configured){$('setupBanner').textContent=T[lang].setup;$('setupBanner').style.display='block'}
+  renderTimes();
+}
+document.querySelectorAll('[data-lang]').forEach(btn=>btn.onclick=()=>applyLanguage(btn.dataset.lang));
+
+if(configured){
+  client.auth.onAuthStateChange((_event,session)=>showSession(session));
+}else{
+  $('setupBanner').style.display='block';
+}
+applyLanguage('ko');
+</script>
+</body>
+</html>
