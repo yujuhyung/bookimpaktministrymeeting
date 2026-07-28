@@ -281,7 +281,18 @@ $('bookBtn').onclick=async()=>{
     duration:Number($('duration').value),phone:phone||null,reason,status:'pending'
   });
   $('bookBtn').disabled=false;
-  if(error){setMessage('studentError',error.code==='23505'?T[lang].slotTaken:T[lang].connectionError);await renderTimes();return}
+  if(error){
+    console.error('BOOKING INSERT ERROR:', error);
+    const technical = [error.message, error.details, error.hint, error.code].filter(Boolean).join(' | ');
+    setMessage(
+      'studentError',
+      error.code==='23505'
+        ? T[lang].slotTaken
+        : `${T[lang].connectionError} (${technical || 'Unknown error'})`
+    );
+    await renderTimes();
+    return;
+  }
   setMessage('studentSuccess',T[lang].saved);await renderTimes();
 };
 
