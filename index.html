@@ -15,7 +15,7 @@ header{display:flex;justify-content:space-between;align-items:center;gap:16px;ma
 .hero{background:linear-gradient(135deg,#22305d,#4255d4);color:#fff;border-radius:28px;padding:34px;box-shadow:var(--shadow);margin-bottom:22px}.hero h1{margin:0 0 10px;font-size:clamp(30px,4.7vw,50px);line-height:1.12}.hero p{margin:0;color:rgba(255,255,255,.82);font-size:16px;line-height:1.7;max-width:820px}
 .grid{display:grid;grid-template-columns:1.35fr .65fr;gap:22px;align-items:start}.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}.main{padding:26px}.side{padding:22px;position:sticky;top:20px}
 .section{padding-bottom:24px;margin-bottom:24px;border-bottom:1px solid var(--line)}.section:last-of-type{border-bottom:0}.title{display:flex;align-items:center;gap:10px;font-weight:900;font-size:18px;margin-bottom:16px}.num{width:30px;height:30px;border-radius:10px;background:var(--soft);color:var(--primary);display:grid;place-items:center;font-size:14px}
-.people{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.person{border:1.5px solid var(--line);border-radius:18px;padding:16px;cursor:pointer;display:flex;align-items:center;gap:13px;transition:.2s;background:#fff}.person:hover{transform:translateY(-2px);border-color:#bbc4ff}.person.selected{background:var(--soft);border-color:var(--primary)}.avatar{width:52px;height:52px;border-radius:16px;background:#f1f3f7;display:grid;place-items:center;font-size:24px}.pname{font-weight:900;margin-bottom:4px}.prole{font-size:13px;color:var(--muted)}
+.people{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.person{border:1.5px solid var(--line);border-radius:18px;padding:16px;cursor:pointer;display:flex;align-items:center;gap:13px;transition:.2s;background:#fff}.person:hover{transform:translateY(-2px);border-color:#bbc4ff}.person.selected{background:var(--soft);border-color:var(--primary)}.avatar{width:52px;height:52px;border-radius:16px;background:#f1f3f7;display:grid;place-items:center;font-size:24px}.pname{font-weight:900;margin-bottom:4px}.prole{font-size:13px;color:var(--muted)}
 .two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}label{display:block;font-size:14px;font-weight:800;margin-bottom:8px}input,select,textarea{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:13px 14px;background:#fff;color:var(--text);outline:none}input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(66,85,212,.09)}textarea{min-height:105px;resize:vertical}
 .times{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.time{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:11px 7px;font-weight:800;cursor:pointer}.time.selected{background:var(--primary);border-color:var(--primary);color:#fff}.time:disabled{opacity:.42;cursor:not-allowed;text-decoration:line-through}
 .primary,.secondary,.danger,.approve{border:0;border-radius:12px;padding:11px 14px;font-weight:900;cursor:pointer}.primary{width:100%;background:var(--primary);color:#fff}.primary:hover{background:var(--primary2)}.secondary{background:#f1f3f7;color:var(--text)}.danger{background:#fff0f0;color:var(--bad)}.approve{background:#e9f8f1;color:var(--ok)}
@@ -56,6 +56,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding-top:26px}
       <div class="people">
         <div class="person" data-person="chester"><div class="avatar">👨🏻‍💼</div><div><div class="pname" data-i18n="chesterName">체스터 목사님</div><div class="prole" data-i18n="chesterRole">상담 · 학교 · 진로</div></div></div>
         <div class="person" data-person="ui"><div class="avatar">👨🏻‍💼</div><div><div class="pname" data-i18n="uiName">의목사님</div><div class="prole" data-i18n="uiRole">생활 · 신앙 · 사역</div></div></div>
+        <div class="person" data-person="jay"><div class="avatar">🧑🏻‍🏫</div><div><div class="pname" data-i18n="jayName">Teacher Jay</div><div class="prole" data-i18n="jayRole">학생 지원 · 학교 · 상담</div></div></div>
       </div>
     </div>
 
@@ -160,7 +161,7 @@ ko:{
  studentView:'학생 예약',adminView:'목사님 관리',heroTitle:'온라인 미팅 예약',
  heroText:'학생의 예약은 온라인 데이터베이스에 저장되고, 로그인한 담당 목사님은 다른 기기에서도 즉시 확인하고 관리할 수 있습니다.',
  step1:'미팅할 분을 선택하세요',chesterName:'체스터 목사님',chesterRole:'상담 · 학교 · 진로',
- uiName:'의목사님',uiRole:'생활 · 신앙 · 사역',step2:'날짜와 시간을 선택하세요',date:'날짜',
+ uiName:'의목사님',uiRole:'생활 · 신앙 · 사역',jayName:'Teacher Jay',jayRole:'학생 지원 · 학교 · 상담',step2:'날짜와 시간을 선택하세요',date:'날짜',
  duration:'미팅 시간',available:'가능한 시간',step3:'예약 정보를 입력하세요',name:'이름',
  namePh:'이름을 입력하세요',phone:'전화번호',optional:'(선택)',phonePh:'전화번호를 입력하세요',reason:'미팅 사유',reasonPh:'간단하게 미팅 내용을 적어주세요.',
  book:'미팅 예약 요청 보내기',summary:'예약 내용',person:'담당자',time:'시간',length:'소요 시간',
@@ -181,7 +182,7 @@ en:{
  studentView:'Student Booking',adminView:'Leader Dashboard',heroTitle:'Online Meeting Booking',
  heroText:'Bookings are stored online, and the assigned pastor can review and manage them immediately from another device after signing in.',
  step1:'Choose who you would like to meet',chesterName:'Pastor.Chester',chesterRole:'Counseling · School · Career',
- uiName:'Pastor.Ui',uiRole:'Life · Faith · Ministry',step2:'Choose a date and time',date:'Date',
+ uiName:'Pastor.Ui',uiRole:'Life · Faith · Ministry',jayName:'Teacher Jay',jayRole:'Student Support · School · Counseling',step2:'Choose a date and time',date:'Date',
  duration:'Meeting length',available:'Available times',step3:'Enter your booking information',name:'Name',
  namePh:'Enter your name',phone:'Phone number',optional:'(optional)',phonePh:'Enter your phone number',reason:'Reason for meeting',reasonPh:'Briefly describe what you would like to discuss.',
  book:'Send Booking Request',summary:'Booking Summary',person:'Meeting with',time:'Time',length:'Length',
@@ -202,6 +203,7 @@ en:{
 function leaderName(key){
   if(key==='chester') return T[lang].chesterName;
   if(key==='ui') return T[lang].uiName;
+  if(key==='jay') return T[lang].jayName;
   return T[lang].notSelected;
 }
 function formatDate(v){
